@@ -1,0 +1,45 @@
+name: skill-channel-zalo
+version: 0.1.0
+mode: service
+entrypoint: src.skill_channel_zalo_service.app:app
+core_api: ">=1.0,<2.0"
+capabilities:
+  - id: channel_gateway.zalo_status
+    description: Return the current Zalo gateway snapshot.
+    input_schema:
+      type: object
+    output_schema:
+      type: object
+    risk_level: low
+    confirmation_required: false
+    retry_policy: bounded_backoff
+    observability_events:
+      - channel_gateway.zalo.status
+  - id: channel_gateway.zalo_webhook
+    description: Process a Zalo webhook payload and emit a reply.
+    input_schema:
+      type: object
+      required:
+        - payload
+    output_schema:
+      type: object
+    risk_level: medium
+    confirmation_required: false
+    retry_policy: bounded_backoff
+    observability_events:
+      - channel_gateway.zalo.webhook
+permissions:
+  read_memory: false
+  write_memory: true
+  internet_access: true
+  file_write: true
+  external_actions: true
+healthcheck:
+  kind: http
+  url: http://127.0.0.1:8422/health
+service:
+  base_url: http://127.0.0.1:8422
+  execute_path: /execute
+  health_path: /health
+timeout_ms: 120000
+enabled_by_default: true
